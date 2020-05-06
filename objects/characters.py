@@ -15,9 +15,12 @@ class PlayerCharacter:
 
 class NonPlayerCharacter:
 
-    def __init__(self, user, character_name: str):
+    def __init__(self, user=None, character_name=None):
         self.user = str(user)
         self.character_name = character_name
 
     def __repr__(self):
-        return "{} was created by {}.\n".format(self.character_name, self.user.name)
+        return "{} ({})".format(self.character_name, self.user)
+
+    def __str__(self):
+        return "{} ({})".format(self.character_name, self.user)

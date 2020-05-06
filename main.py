@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 from discord.ext import commands
 
@@ -8,6 +9,10 @@ from cogs import GamblingCog, GameManagementCog
 # DISCORD_TOKEN=your_very_long_cryptic_token
 load_dotenv('auth.env')
 TOKEN = os.getenv('DISCORD_TOKEN')
+
+# persistent storage of characters, npcs, etc.
+if not Path('./session').exists():
+    Path.mkdir(Path('session'))
 
 bot = commands.Bot(command_prefix='!', description="This machine helps you play Western City.",)
 bot.add_cog(GamblingCog(bot))

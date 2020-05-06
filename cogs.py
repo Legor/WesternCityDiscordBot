@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 from discord.ext import commands
-from objects.characters import PlayerCharacter
+from objects.characters import PlayerCharacter, NonPlayerCharacter
 
 
 class GamblingCog(commands.Cog, name="Gambling"):
@@ -25,29 +25,30 @@ class GameManagementCog(commands.Cog, name="Management"):
     def __init__(self, bot):
         self.bot = bot
         self.players_list = []
-
-    def __getstate__(self):
-        return ({
-            'players' : self.players_list
-            })
-        pass
-
-    def __setstate__(self, state_dict):
-        self.players_list = state_dict['players']
+        self.npc_list = []
 
     def save_session(self):
-        with open("players.json", "w") as output_file:
+        with open("./session/players.json", "w") as output_file:
             json.dump([p.__dict__ for p in self.players_list], output_file)
+        with open("./session/npcs.json", "w") as output_file:
+            json.dump([p.__dict__ for p in self.npc_list], output_file)
 
-    # load a list of previously store players
+    # load a list of previously stored characters
     def load_session(self):
-        if Path('players.json').exists():
-            with open("players.json", "r") as read_file:
+        if Path('./session/players.json').exists():
+            with open("./session/players.json", "r") as read_file:
                 data = json.load(read_file)
                 for d in data:
                     p = PlayerCharacter()
                     p.__dict__.update(d)
                     self.players_list.append(p)
+        if Path('./session/npcs.json').exists():
+            with open("./session/npcs.json", "r") as read_file:
+                data = json.load(read_file)
+                for d in data:
+                    p = NonPlayerCharacter()
+                    p.__dict__.update(d)
+                    self.npc_list.append(p)
 
     @commands.command(name='new_player', help='Create a new player character.')
     async def add_new_player(self, ctx, character_name: str):
@@ -67,6 +68,13 @@ class GameManagementCog(commands.Cog, name="Management"):
             await ctx.send('No players loaded.')
         else:
             await ctx.send(', '.join([str(p) for p in self.players_list]))
+
+    @commands.command(name='list_npcs', help='Print the list of NPCs.')
+    async def list_npcs(self, ctx):
+        if len(self.npc_list) < 1:
+            await ctx.send('No NPCs loaded.')
+        else:
+            await ctx.send(', '.join([str(p) for p in self.npc_list]))
 
 
 
