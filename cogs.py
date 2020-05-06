@@ -19,11 +19,32 @@ class GamblingCog(commands.Cog, name="Gambling"):
         ]
         await ctx.send(', '.join(dice))
 
+class PokerChipsCog(commands.Cog, name="Poker Chips"):
+
+    def __init__(self, bot):
+        self.bot = bot
+        self.chips = {}
+
+    @commands.command(name='spend', help='Spend the given amount of chips (default 1).')
+    async def spend_chip(self, ctx, amount: int=1):
+        if ctx.author not in self.chips.keys():
+            await ctx.send('Can\'t find chips for {}'.format(ctx.author))
+        elif self.chips[ctx.author] - amount < 0:
+            await ctx.send('{} only has {} chips left. Can\'t spend {} chips.'.format(ctx.author,
+                                                                                      self.chips[ctx.author], amount))
+        else:
+            self.chips[ctx.author] -= amount
+            await ctx.send('{} spend {} chips, {} left.'.format(ctx.author, amount, self.chips[ctx.author]))
+
+
+
+
 
 class GameManagementCog(commands.Cog, name="Management"):
 
     def __init__(self, bot):
         self.bot = bot
+        self.chips = PokerChipsCog
         self.players_list = []
         self.npc_list = []
 
@@ -58,9 +79,12 @@ class GameManagementCog(commands.Cog, name="Management"):
         self.save_session()
         await ctx.send('Added {} for {}'.format(character_name, ctx.author))
 
-    @commands.command(name='load_players', help='Load a list of previously created players.')
-    async def load_player_list(self, ctx):
+    @commands.command(name='restart', help='Check and load a list of previously created characters.')
+    @commands.has_role('gamemaster')
+    async def restart(self, ctx):
+        await ctx.send('Looking for existing characters...')
         self.load_session()
+        await ctx.send('Found {} characters and {} NPCs'.format(len(self.players_list), len(self.npc_list)))
 
     @commands.command(name='list_players', help='Print the list of current players.')
     async def list_players(self, ctx):
