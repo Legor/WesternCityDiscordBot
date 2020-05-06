@@ -1,6 +1,6 @@
 class PlayerCharacter:
 
-    def __init__(self, user, character_name: str):
+    def __init__(self, user=None, character_name=None):
         self.user = str(user)
         self.character_name = character_name
         self.friend = None
