@@ -1,9 +1,9 @@
-# bot.py
 import random
-import pickle
+import json
 
 from discord.ext import commands
 from objects.characters import PlayerCharacter
+
 
 class GamblingCog(commands.Cog, name="Gambling"):
 
@@ -35,22 +35,15 @@ class GameManagementCog(commands.Cog, name="Management"):
         self.players_list = state_dict['players']
 
     def save_session(self):
-        with open("session.pickle", 'wb') as out_file:
-            try:
-                pickle.dump(self, out_file)
-                pass
-            except Exception as Err:
-                print(Err)
-
-    @commands.Cog.listener()
-    async def on_command_completion(self, context):
-        self.save_session()
+        with open("players.json", "w") as output_file:
+            json.dump([p.__dict__ for p in self.players_list], output_file)
 
     @commands.command(name='new_player', help='Create a new player character.')
     async def add_new_player(self, ctx, character_name: str):
         new_player = PlayerCharacter(character_name=character_name, user=ctx.author)
         self.players_list.append(new_player)
 
+        self.save_session()
         await ctx.send('Added {} for {}'.format(character_name, ctx.author))
 
     @commands.command(name='list_players', help='Print the list of current players.')

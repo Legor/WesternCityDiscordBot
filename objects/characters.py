@@ -1,7 +1,7 @@
 class PlayerCharacter:
 
     def __init__(self, user, character_name: str):
-        self.user = user
+        self.user = str(user)
         self.character_name = character_name
         self.friend = None
         self.enemy = None
@@ -16,7 +16,7 @@ class PlayerCharacter:
 class NonPlayerCharacter:
 
     def __init__(self, user, character_name: str):
-        self.user = user
+        self.user = str(user)
         self.character_name = character_name
 
     def __repr__(self):
