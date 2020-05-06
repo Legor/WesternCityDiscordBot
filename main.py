@@ -9,7 +9,7 @@ from cogs import GamblingCog, GameManagementCog
 load_dotenv('auth.env')
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix='!', description="This machine helps you play Western City.",)
 bot.add_cog(GamblingCog(bot))
 bot.add_cog(GameManagementCog(bot))
 
