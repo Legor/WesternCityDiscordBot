@@ -86,6 +86,22 @@ class GameManagementCog(commands.Cog, name="Management"):
         self.save_session()
         await ctx.send('Added {} for {}'.format(character_name, ctx.author))
 
+    @commands.command(name='assign_pc', help='Assign an existing player character to a player.')
+    #@commands.has_role('gamemaster')
+    async def assign_player_character(self, ctx, character_name: str, player_name: str):
+        found = False
+        for p in self.players_list:
+            if character_name == p.character_name:
+                found = True
+                p.user = player_name
+                break
+        if found:
+            self.save_session()
+            await ctx.send('Assigned {} to {}'.format(character_name, player_name))
+        else:
+            await ctx.send('Couldn\'t find character {}'.format(character_name))
+
+
     @commands.command(name='restart', help='Check and load a list of previously created characters.')
     #@commands.has_role('gamemaster')
     async def restart(self, ctx):
