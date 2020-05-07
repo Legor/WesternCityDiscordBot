@@ -30,6 +30,9 @@ class PokerChipsCog(commands.Cog, name="Poker Chips"):
         # current chips in the pool
         self.pool = 0
 
+    def add_player(self, player_name:str):
+        self.chips[player_name] = 5
+
     @commands.command(name='spend', help='Spend the given amount of chips (default 1).')
     async def spend_chip(self, ctx, amount: int=1):
         if ctx.author not in self.chips.keys():
@@ -48,6 +51,7 @@ class GameManagementCog(commands.Cog, name="Management"):
         self.bot = bot
         self.chips = PokerChipsCog
         self.character_list = []
+        self.player_list = []
         self.npc_list = []
 
     @commands.command(name='restart', help='Check and load a list of previously created characters.')
@@ -82,6 +86,14 @@ class GameManagementCog(commands.Cog, name="Management"):
                     p.__dict__.update(d)
                     self.npc_list.append(p)
 
+    @commands.command(name='add_player',  aliases=["addp"], help='Add a player to the game.')
+    #@commands.has_role('gamemaster')
+    async def add_player(self, ctx, player_name: str):
+
+        self.player_list.append(player_name)
+        self.bot.get_cog('Poker Chips').add_player(player_name)
+        await ctx.send('Added {} as player.'.format(player_name))
+
     @commands.command(name='new_pc', help='Create a new player character.')
     async def add_new_player_character(self, ctx, character_name: str):
         new_player = PlayerCharacter(character_name=character_name, user=ctx.author)
@@ -104,6 +116,13 @@ class GameManagementCog(commands.Cog, name="Management"):
             await ctx.send('Assigned {} to {}'.format(character_name, player_name))
         else:
             await ctx.send('Couldn\'t find character {}'.format(character_name))
+
+    @commands.command(name='list_players', aliases=["lp"], help='Print the list of active players.')
+    async def list_players(self, ctx):
+        if len(self.player_list) < 1:
+            await ctx.send('No active players.')
+        else:
+            await ctx.send(', '.join([str(p) for p in self.player_list]))
 
     @commands.command(name='list_characters', aliases=["lc", "players"], help='Print the list of available characters.')
     async def list_characters(self, ctx):
