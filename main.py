@@ -14,7 +14,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 if not Path('./session').exists():
     Path.mkdir(Path('session'))
 
-bot = commands.Bot(command_prefix='!', description="This machine helps you playing Western City.",)
+bot = commands.Bot(command_prefix='!', description="This machine helps you play Western City.",)
 bot.add_cog(GamblingCog(bot))
 bot.add_cog(GameManagementCog(bot))
 bot.add_cog(PokerChipsCog(bot))

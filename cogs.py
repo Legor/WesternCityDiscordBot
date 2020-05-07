@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 from discord.ext import commands
+from discord import Embed
 from objects.characters import PlayerCharacter, NonPlayerCharacter
 
 
@@ -18,6 +19,7 @@ class GamblingCog(commands.Cog, name="Gambling"):
             for _ in range(number_of_dice)
         ]
         await ctx.send(', '.join(dice))
+
 
 class PokerChipsCog(commands.Cog, name="Poker Chips"):
 
@@ -56,6 +58,8 @@ class GameManagementCog(commands.Cog, name="Management"):
 
     # load a list of previously stored characters
     def load_session(self):
+        self.players_list.clear()
+        self.npc_list.clear()
         if Path('./session/players.json').exists():
             with open("./session/players.json", "r") as read_file:
                 data = json.load(read_file)
@@ -86,12 +90,16 @@ class GameManagementCog(commands.Cog, name="Management"):
         self.load_session()
         await ctx.send('Found {} characters and {} NPCs'.format(len(self.players_list), len(self.npc_list)))
 
-    @commands.command(name='list_players', help='Print the list of current players.')
+    @commands.command(name='list_players', aliases=["lp", "players"], help='Print the list of current players.')
     async def list_players(self, ctx):
+
         if len(self.players_list) < 1:
             await ctx.send('No players loaded.')
         else:
-            await ctx.send(', '.join([str(p) for p in self.players_list]))
+            embed = Embed(title="Available player characters", color=0x00ff00)
+            for p in self.players_list:
+                embed.add_field(name=p.character_name, value="{} \n {}".format(p.user, p.friend), inline=False)
+            await ctx.send(embed=embed)
 
     @commands.command(name='list_npcs', help='Print the list of NPCs.')
     async def list_npcs(self, ctx):
