@@ -12,7 +12,7 @@ class GamblingCog(commands.Cog, name="Gambling"):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='roll', help='Simulates rolling dice.')
+    @commands.command(name='roll', aliases=["r", "dice"], help='Simulates rolling dice.')
     async def roll(self, ctx, number_of_dice: int, number_of_sides: int):
         dice = [
             str(random.choice(range(1, number_of_sides + 1)))
@@ -25,7 +25,10 @@ class PokerChipsCog(commands.Cog, name="Poker Chips"):
 
     def __init__(self, bot):
         self.bot = bot
+        # available chips per player
         self.chips = {}
+        # current chips in the pool
+        self.pool = 0
 
     @commands.command(name='spend', help='Spend the given amount of chips (default 1).')
     async def spend_chip(self, ctx, amount: int=1):
@@ -75,8 +78,8 @@ class GameManagementCog(commands.Cog, name="Management"):
                     p.__dict__.update(d)
                     self.npc_list.append(p)
 
-    @commands.command(name='new_player', help='Create a new player character.')
-    async def add_new_player(self, ctx, character_name: str):
+    @commands.command(name='new_pc', help='Create a new player character.')
+    async def add_new_player_character(self, ctx, character_name: str):
         new_player = PlayerCharacter(character_name=character_name, user=ctx.author)
         self.players_list.append(new_player)
 
@@ -84,17 +87,17 @@ class GameManagementCog(commands.Cog, name="Management"):
         await ctx.send('Added {} for {}'.format(character_name, ctx.author))
 
     @commands.command(name='restart', help='Check and load a list of previously created characters.')
-    @commands.has_role('gamemaster')
+    #@commands.has_role('gamemaster')
     async def restart(self, ctx):
         await ctx.send('Looking for existing characters...')
         self.load_session()
         await ctx.send('Found {} characters and {} NPCs'.format(len(self.players_list), len(self.npc_list)))
 
-    @commands.command(name='list_players', aliases=["lp", "players"], help='Print the list of current players.')
-    async def list_players(self, ctx):
+    @commands.command(name='list_characters', aliases=["lc", "players"], help='Print the list of available characters.')
+    async def list_characters(self, ctx):
 
         if len(self.players_list) < 1:
-            await ctx.send('No players loaded.')
+            await ctx.send('No characters loaded.')
         else:
             embed = Embed(title="Available player characters", color=0x00ff00)
             for p in self.players_list:
